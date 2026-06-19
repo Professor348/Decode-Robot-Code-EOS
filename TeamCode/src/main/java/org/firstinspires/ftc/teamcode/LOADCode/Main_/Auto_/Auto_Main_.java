@@ -681,7 +681,7 @@ public class Auto_Main_ extends NextFTCOpMode {
         @NonNull
         @Override
         public String toString() {
-            return "juliets Test Auto";
+            return "juliet Test Auto";
         }
     }
 
