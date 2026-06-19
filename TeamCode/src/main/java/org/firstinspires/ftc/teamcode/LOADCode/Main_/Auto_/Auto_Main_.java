@@ -652,25 +652,37 @@ public class Auto_Main_ extends NextFTCOpMode {
         public Command runAuto(){
             return new SequentialGroup(
                     new InstantCommand(Commands.setFlywheelState( Turret.flywheelState.ON)),
-                    Commands.runPath(paths.nearStart_to_midShoot),
+                    Commands.runPath(paths.farStart_to_farShoot, true, 1),
                     Commands.shootBalls(),
                     Commands.setIntakeMode(ON),
-                    Commands.runPath(paths.midShoot_to_midPreload),
-                    Commands.runPath(paths.midPreload_to_midShoot),
-                    Commands.shootBalls()
-
-
-
-
-
-
+                    Commands.runPath(paths.farShoot_to_farPreload, true, 1),
+                    Commands.runPath(paths.farPreload_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.setIntakeMode(ON),
+                    Commands.runPath(paths.farShoot_to_rampIntake, true, 1),
+                    Commands.runPath(paths.rampIntake_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.setIntakeMode(ON),
+                    Commands.runPath(paths.farShoot_to_hpPreload, true, 1),
+                    Commands.runPath(paths.hpPreload_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.setIntakeMode(ON),
+                    Commands.runPath(paths.farShoot_to_hpPreloadLine, true, 1),
+                    Commands.runPath(paths.hpPreloadLine_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.setIntakeMode(ON),
+                    Commands.runPath(paths.farShoot_to_hpPreloadLine, true, 1),
+                    Commands.runPath(paths.hpPreloadLine_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.runPath(paths.farShoot_to_farLeave, true, 1)
             );
         }
-
+    }
         @NonNull
         @Override
         public String toString() {
             return "juliets Test Auto";
         }
     }
-}
+
+
