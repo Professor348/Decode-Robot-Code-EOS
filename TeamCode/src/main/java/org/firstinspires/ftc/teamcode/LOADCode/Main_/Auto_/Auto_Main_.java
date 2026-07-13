@@ -53,6 +53,7 @@ public class Auto_Main_ extends NextFTCOpMode {
 
     // Auto parameter variables
     private boolean turretOn = true;
+    double storedHoodOffset = 0;
 
     @SuppressWarnings("unused")
     public Auto_Main_() {
@@ -81,7 +82,8 @@ public class Auto_Main_ extends NextFTCOpMode {
                         new Near_12Ball(),
                         new Near_9Ball(),
                         new Far_12Ball(),
-                        new Far_9Ball()
+                        new Far_9Ball(),
+                        new julietAuto()
 
                 ));
         prompter.onComplete(() -> {
@@ -122,6 +124,11 @@ public class Auto_Main_ extends NextFTCOpMode {
             selectedAuto.runAuto().schedule();
         }
         turretOn = selectedAuto.getTurretEnabled();
+        if (selectedAuto.getStartPose() == paths.nearStart){
+            storedHoodOffset = 10;
+        }else{
+            storedHoodOffset = -20;
+        }
         timer25Sec.restart();
 
         // Indicate that initialization is done
@@ -135,7 +142,7 @@ public class Auto_Main_ extends NextFTCOpMode {
         telemetry.addData("Alliance", selectedAlliance);
         panelsTelemetry.addData("Turret Target Pos", Robot.turret.rotation.target);
         panelsTelemetry.addData("Turret Actual Pos", Robot.turret.rotation.getAngleAbsolute());
-        Robot.turret.updateAimbot(turretOn, true, selectedAuto.getHoodOffset());
+        Robot.turret.updateAimbot(turretOn, true, storedHoodOffset);
         Robot.turret.updateFlywheel(0);
         MecanumDrivetrainClass.robotPose = Robot.drivetrain.follower.getPose();
         telemetry.update();
@@ -166,23 +173,18 @@ public class Auto_Main_ extends NextFTCOpMode {
         abstract Pose getEndPose();
 
         /**
-         * @return The offset of the hood for this auto
-         */
-        abstract double getHoodOffset();
-
-        /**
          * @return A boolean indicating whether the turret is enabled.
          */
-        abstract boolean getTurretEnabled();
+        boolean getTurretEnabled(){return true;}
 
-        abstract boolean autoLeave();
+        boolean autoLeave(){return true;}
 
         /** Override this to schedule the auto command*/
         abstract Command runAuto();
         /** Override this to rename the auto*/
         @NonNull
         @Override
-        public abstract String toString();
+        public String toString(){return "auto";}
     }
 
     private class Far_9Ball extends Auto{
@@ -195,15 +197,7 @@ public class Auto_Main_ extends NextFTCOpMode {
             return paths.farLeave;
         }
         @Override
-        double getHoodOffset() {
-            return -20;
-        }
-        @Override
         public boolean getTurretEnabled(){
-            return true;
-        }
-        @Override
-        boolean autoLeave() {
             return true;
         }
 
@@ -240,14 +234,6 @@ public class Auto_Main_ extends NextFTCOpMode {
         }
         @Override
         public boolean getTurretEnabled(){
-            return true;
-        }
-        @Override
-        double getHoodOffset() {
-            return -20;
-        }
-        @Override
-        boolean autoLeave() {
             return true;
         }
 
@@ -291,14 +277,6 @@ public class Auto_Main_ extends NextFTCOpMode {
         public boolean getTurretEnabled(){
             return true;
         }
-        @Override
-        double getHoodOffset() {
-            return 10;
-        }
-        @Override
-        boolean autoLeave() {
-            return true;
-        }
 
         @Override
         public Command runAuto(){
@@ -336,14 +314,6 @@ public class Auto_Main_ extends NextFTCOpMode {
         public boolean getTurretEnabled(){
             return true;
         }
-        @Override
-        double getHoodOffset() {
-            return 10;
-        }
-        @Override
-        boolean autoLeave() {
-            return true;
-        }
 
         @Override
         public Command runAuto(){
@@ -378,18 +348,6 @@ public class Auto_Main_ extends NextFTCOpMode {
         @Override
         public Pose getEndPose(){
             return paths.nearLeave;
-        }
-        @Override
-        boolean getTurretEnabled() {
-            return true;
-        }
-        @Override
-        double getHoodOffset() {
-            return 10;
-        }
-        @Override
-        boolean autoLeave() {
-            return true;
         }
 
         @Override
@@ -436,18 +394,6 @@ public class Auto_Main_ extends NextFTCOpMode {
         @Override
         public Pose getEndPose(){
             return paths.nearLeave;
-        }
-        @Override
-        boolean getTurretEnabled() {
-            return true;
-        }
-        @Override
-        double getHoodOffset() {
-            return 10;
-        }
-        @Override
-        boolean autoLeave() {
-            return true;
         }
 
         @Override
@@ -498,14 +444,6 @@ public class Auto_Main_ extends NextFTCOpMode {
         public boolean getTurretEnabled(){
             return true;
         }
-        @Override
-        double getHoodOffset() {
-            return 0;
-        }
-        @Override
-        boolean autoLeave() {
-            return true;
-        }
 
         @Override
         public Command runAuto(){
@@ -548,14 +486,6 @@ public class Auto_Main_ extends NextFTCOpMode {
         }
         @Override
         public boolean getTurretEnabled(){
-            return true;
-        }
-        @Override
-        double getHoodOffset() {
-            return 0;
-        }
-        @Override
-        boolean autoLeave() {
             return true;
         }
 
@@ -601,14 +531,6 @@ public class Auto_Main_ extends NextFTCOpMode {
         public boolean getTurretEnabled(){
             return true;
         }
-        @Override
-        double getHoodOffset() {
-            return 0;
-        }
-        @Override
-        boolean autoLeave() {
-            return true;
-        }
 
         @Override
         public Command runAuto(){
@@ -646,14 +568,6 @@ public class Auto_Main_ extends NextFTCOpMode {
         }
         @Override
         public boolean getTurretEnabled(){
-            return true;
-        }
-        @Override
-        double getHoodOffset() {
-            return 0;
-        }
-        @Override
-        boolean autoLeave() {
             return true;
         }
 
@@ -702,16 +616,8 @@ public class Auto_Main_ extends NextFTCOpMode {
             return paths.midShoot;
         }
         @Override
-        boolean getTurretEnabled() {
-            return true;
-        }
-        @Override
         boolean autoLeave() {
             return false;
-        }
-        @Override
-        double getHoodOffset() {
-            return 0;
         }
 
         @Override
@@ -731,4 +637,52 @@ public class Auto_Main_ extends NextFTCOpMode {
             return "Test Auto";
         }
     }
-}
+
+    private class julietAuto extends Auto{
+        @Override
+        Pose getStartPose() {
+            return paths.nearStart;
+        }
+        @Override
+        public Pose getEndPose(){
+            return paths.nearLeave;
+        }
+
+        @Override
+        public Command runAuto(){
+            return new SequentialGroup(
+                    new InstantCommand(Commands.setFlywheelState( Turret.flywheelState.ON)),
+                    Commands.runPath(paths.farStart_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.setIntakeMode(ON),
+                    Commands.runPath(paths.farShoot_to_farPreload, true, 1),
+                    Commands.runPath(paths.farPreload_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.setIntakeMode(ON),
+                    Commands.runPath(paths.farShoot_to_rampIntake, true, 1),
+                    Commands.runPath(paths.rampIntake_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.setIntakeMode(ON),
+                    Commands.runPath(paths.farShoot_to_hpPreload, true, 1),
+                    Commands.runPath(paths.hpPreload_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.setIntakeMode(ON),
+                    Commands.runPath(paths.farShoot_to_hpPreloadLine, true, 1),
+                    Commands.runPath(paths.hpPreloadLine_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.setIntakeMode(ON),
+                    Commands.runPath(paths.farShoot_to_hpPreloadLine, true, 1),
+                    Commands.runPath(paths.hpPreloadLine_to_farShoot, true, 1),
+                    Commands.shootBalls(),
+                    Commands.runPath(paths.farShoot_to_farLeave, true, 1)
+            );
+        }
+    }
+        @NonNull
+        @Override
+        public String toString() {
+            return "juliet Test Auto";
+        }
+    }
+
+
