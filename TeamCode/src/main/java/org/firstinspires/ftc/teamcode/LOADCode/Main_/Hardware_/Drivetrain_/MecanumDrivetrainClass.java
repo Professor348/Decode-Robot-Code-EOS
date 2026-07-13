@@ -87,6 +87,29 @@ public class MecanumDrivetrainClass {
         follower.update();
     }
 
+    /**
+     * Uses PedroPathing's follower class to implement a mecanum drive controller.
+     * Must be called every loop to function properly.
+     * @param forward The joystick value for driving forward/backward
+     * @param strafe The joystick value for strafing
+     * @param rotate The joystick value to turn left/right
+     * @param robotCentric If true, enables robot centric. If false, enables field centric.
+     * @param alliance The current alliance
+     */
+    public void pedroMecanumDrive(double forward, double strafe, double rotate, boolean robotCentric, LoadHardwareClass.Alliance alliance){
+        double headingOffset = 0;
+        if (alliance == LoadHardwareClass.Alliance.BLUE){
+            headingOffset = Math.PI;
+        }
+
+        follower.setTeleOpDrive(
+                -forward * speedMultiplier,
+                -strafe * speedMultiplier,
+                -rotate * speedMultiplier,
+                robotCentric, headingOffset);
+        follower.update();
+    }
+
     public void runPath(PathChain path, boolean holdEndpoint){
         follower.followPath(path, holdEndpoint);
         follower.update();
@@ -108,5 +131,26 @@ public class MecanumDrivetrainClass {
         robotZone.setRotation(follower.getPose().getHeading());
 
         return (robotZone.isFullyInside(LoadHardwareClass.NearLaunchZone));
+    }
+    public boolean isFullyInFarZone(){
+        PolygonZone robotZone = new PolygonZone(15, 16);
+        robotZone.setPosition(follower.getPose().getX(), follower.getPose().getY());
+        robotZone.setRotation(follower.getPose().getHeading());
+
+        return (robotZone.isFullyInside(LoadHardwareClass.FarLaunchZone));
+    }
+    public boolean isPartlyInNearZone(){
+        PolygonZone robotZone = new PolygonZone(15, 16);
+        robotZone.setPosition(follower.getPose().getX(), follower.getPose().getY());
+        robotZone.setRotation(follower.getPose().getHeading());
+
+        return (robotZone.isInside(LoadHardwareClass.NearLaunchZone));
+    }
+    public boolean isPartlyInFarZone(){
+        PolygonZone robotZone = new PolygonZone(15, 16);
+        robotZone.setPosition(follower.getPose().getX(), follower.getPose().getY());
+        robotZone.setRotation(follower.getPose().getHeading());
+
+        return (robotZone.isInside(LoadHardwareClass.FarLaunchZone));
     }
 }

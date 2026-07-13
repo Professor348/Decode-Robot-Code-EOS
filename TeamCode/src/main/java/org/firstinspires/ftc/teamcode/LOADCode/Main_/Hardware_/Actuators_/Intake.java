@@ -55,9 +55,8 @@ public class Intake {
     /**
      * Sets the current mode of the intake
      * @param intakeDirection the current mode of the Intake
-     * @param transferDirection the current mode of the Transfer
      */
-    public void setMode(intakeMode intakeDirection, intakeMode transferDirection) {
+    public void setMode(intakeMode intakeDirection) {
         switch (intakeDirection){
             case OFF:
                 intake.setPower(0);
@@ -67,17 +66,6 @@ public class Intake {
                 break;
             case REVERSE:
                 intake.setPower(-1);
-                break;
-        }
-        switch (transferDirection){
-            case OFF:
-                belt.setPower(0);
-                break;
-            case ON:
-                belt.setPower(1);
-                break;
-            case REVERSE:
-                belt.setPower(-1);
                 break;
         }
     }

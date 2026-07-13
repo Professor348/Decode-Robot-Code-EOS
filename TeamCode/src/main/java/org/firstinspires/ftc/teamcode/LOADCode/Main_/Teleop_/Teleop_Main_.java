@@ -203,6 +203,7 @@ public class Teleop_Main_ extends LinearOpMode {
         Robot.intake.setTransfer(transferState.DOWN);
         Robot.lights.setSolidAllianceDisplay(selectedAlliance);
         telemetry.setMsTransmissionInterval(200);
+        Robot.turret.setFlywheelState(flywheelState.ON);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -339,66 +340,20 @@ public class Teleop_Main_ extends LinearOpMode {
      */
     public void Gamepad1() {
 
-        double ariDeadZone = 0.3;
-
-        if (turretOn && gamepad1.a) {teleopTurretState = turretState.PAUSED;}
-
-        if (gamepad1.left_trigger >= ariDeadZone && gamepad1.right_trigger >= ariDeadZone) {
-            if (!holdJustTriggered){
-                holdPoint = Robot.drivetrain.follower.getPose();
-                holdJustTriggered = true;
-            }
-            //Robot.drivetrain.follower.holdPoint(holdPoint);
-        } else if (gamepad1.left_trigger >= ariDeadZone) {
-            if (holdJustTriggered){
-                Robot.drivetrain.follower.startTeleOpDrive();
-                holdJustTriggered = false;
-            }
+        Robot.drivetrain.speedMultiplier = 1;
+        if (shootingState != 0 && shootingState != 4){
+            Robot.drivetrain.speedMultiplier = 0.4;
+        }else if (gamepad1.right_trigger > 0.2){
             Robot.drivetrain.speedMultiplier = 0.33;
-        } else if (gamepad1.right_trigger >= ariDeadZone) {
-            if (holdJustTriggered){
-                Robot.drivetrain.follower.startTeleOpDrive();
-                holdJustTriggered = false;
-            }
-            Robot.drivetrain.speedMultiplier = 1;
-        } else {
-            if (holdJustTriggered){
-                Robot.drivetrain.follower.startTeleOpDrive();
-                holdJustTriggered = false;
-            }
-            Robot.drivetrain.speedMultiplier = 0.66;
         }
-
-//        if (gamepad1.bWasPressed()){
-//            if (selectedAlliance == LoadHardwareClass.Alliance.RED){
-//                Robot.drivetrain.follower.setPose(new Pose(9.6, 7.1, Math.toRadians(90)));
-//            }else if (selectedAlliance == LoadHardwareClass.Alliance.BLUE){
-//                Robot.drivetrain.follower.setPose(new Pose(144-9.6, 7.1, Math.toRadians(90)));
-//                Robot.drivetrain.follower.getPoseTracker().setPose();
-//            }
-////            Turret.zeroed = false;
-////            Turret.zeroingState = 0;
-////            while (!isStopRequested() && Robot.turret.zeroTurret()){
-////                Robot.sleep(0);
-////            }
-//        }
 
         Robot.drivetrain.pedroMecanumDrive(
                 gamepad1.left_stick_y,
                 gamepad1.left_stick_x,
                 gamepad1.right_stick_x,
-                true
+                false,
+                selectedAlliance
         );
-
-        if (gamepad1.yWasPressed()){
-            turretOn = !turretOn;
-        }
-
-        if (gamepad1.dpadLeftWasPressed()){
-            selectedAlliance = LoadHardwareClass.Alliance.BLUE;
-        }else if (gamepad1.dpadRightWasPressed()){
-            selectedAlliance = LoadHardwareClass.Alliance.RED;
-        }
     }
 
     /**
@@ -446,111 +401,44 @@ public class Teleop_Main_ extends LinearOpMode {
      */
     public void Gamepad2() {
 
-        if (!turretOn) {teleopTurretState = turretState.OFF;}
-
-        double dylanStickDeadzones = 0.2;
-
         //Intake Controls (Left Stick Y)
         if (shootingState == 0) {
             intakeMode intake = OFF;
-            intakeMode belt = OFF;
-            if (Math.abs(gamepad2.left_stick_y) >= dylanStickDeadzones){
+            if (Math.abs(gamepad1.left_trigger) >= 0.2 || !Robot.intake.getBottomSensorState() || !Robot.intake.getTopSensorState()){
                 intake = ON;
-            }else if (gamepad2.left_bumper){
+            }else if (gamepad1.left_bumper){
                 intake = REVERSE;
             }
-            if (Math.abs(gamepad2.right_stick_y) >= dylanStickDeadzones){
-                belt = ON;
-            }else if (gamepad2.right_bumper){
-                belt = REVERSE;
-            }
-            Robot.intake.setMode(intake, belt);
-
-            //Flywheel Toggle Control (Y Button)
-            if (gamepad2.yWasPressed()) {
-                if (Robot.turret.flywheelMode == flywheelState.OFF) {
-                    Robot.turret.setFlywheelState(flywheelState.ON);
-                } else {
-                    Robot.turret.setFlywheelState(flywheelState.OFF);
-                }
-            }
-
-            if (gamepad2.rightStickButtonWasPressed() && zeroState == 0){
-                zeroState = 1;
-            }
-            switch (zeroState){
-                case 1:
-                    Robot.turret.rotation.setAngle(90);
-                    if (Robot.turret.rotation.isWithinMaxError()){
-                        zeroState++;
-                        Turret.zeroed = false;
-                        Turret.zeroingState = 0;
-                    }
-                    break;
-                case 2:
-                    if (!Turret.zeroed){
-                        Robot.turret.zeroTurret();
-                    }else{
-                        zeroState = 0;
-                    }
-                    break;
-            }
-
-            if (forceGateOpen){
-                Robot.turret.setGateState(gatestate.OPEN);
-            }else{
-                Robot.turret.setGateState(gatestate.CLOSED);
-            }
+            Robot.intake.setMode(intake);
         }
 
-        if (zeroState == 0){
-            Robot.turret.updateAimbot(teleopTurretState==turretState.ON, hoodOn, hoodOffset);
-        }
-
-        if (gamepad2.left_trigger > 0.8 && !leftTrigOldState && manualFlywheelState > 1){
-            leftTrigOldState = true;
-            manualFlywheelState--;
-        }else if (gamepad2.left_trigger < 0.2 && leftTrigOldState){
-            leftTrigOldState = false;
-        }
-        if (gamepad2.right_trigger > 0.8 && !rightTrigOldState && manualFlywheelState < 4){
-            rightTrigOldState = true;
-            manualFlywheelState++;
-        }else if (gamepad2.right_trigger < 0.2 && rightTrigOldState){
-            rightTrigOldState = false;
-        }
-        if (gamepad2.aWasPressed()){
-            manualFlywheelState = 0;
-            hoodOffset = 0;
-        }
-        Robot.turret.updateFlywheel(manualFlywheelState);
+        Robot.turret.updateFlywheel(0);
+        Robot.turret.updateAimbot(true, true, hoodOffset);
 
         // Hood Controls
-        if (gamepad2.dpadUpWasPressed()){
+        if (gamepad1.dpadUpWasPressed()){
             hoodOffset += 10;
-        }else if (gamepad2.dpadDownWasPressed()){
+        }else if (gamepad1.dpadDownWasPressed()){
             hoodOffset -= 10;
         }
-        if (gamepad2.dpadLeftWasPressed()){
-            Robot.turret.turretOffset -= turretOffsetStep;
-        }else if (gamepad2.dpadRightWasPressed()){
-            Robot.turret.turretOffset += turretOffsetStep;
+        if (gamepad1.aWasPressed()){
+            Robot.turret.turretOffset += Robot.turret.limelight.result.getTx();
         }
 
-        if (gamepad2.backWasPressed()){
-            forceGateOpen = !forceGateOpen;
-        }
-
-        if (Robot.turret.getFlywheelRPM() > Robot.turret.getFlywheelCurrentMaxSpeed()-100){
-            gamepad2.rumble(10);
-        }
+        boolean isPartlyInShootZone = Robot.drivetrain.isPartlyInFarZone() || Robot.drivetrain.isPartlyInNearZone();
+        boolean isFullyInShootZone = Robot.drivetrain.isFullyInFarZone() || Robot.drivetrain.isFullyInNearZone();
 
         //Shoot (B Button Press)
         // Increment the shooting state
-        if (gamepad2.bWasPressed() && shootingState < 1 && Robot.turret.getFlywheelRPM() > Robot.turret.getFlywheelCurrentMaxSpeed()-100) {
+        if ((isFullyInShootZone || (gamepad1.bWasPressed() && isPartlyInShootZone)) &&
+                Robot.drivetrain.follower.getVelocity().getMagnitude() < 5 &&
+                Robot.drivetrain.follower.getAngularVelocity() < 0.02 &&
+                shootingState < 1 &&
+                Robot.turret.getFlywheelRPM() > Robot.turret.getFlywheelCurrentMaxSpeed()-100
+        ) {
             shootingState++;
         }
-        if (gamepad2.xWasPressed()){
+        if (gamepad1.xWasPressed()){
             shootingState = 4;
         }
         switch (shootingState) {
@@ -562,9 +450,7 @@ public class Teleop_Main_ extends LinearOpMode {
                 if (Robot.turret.getGate() == gatestate.CLOSED){
                     stateTimer.restart();
                 }
-                if (!forceGateOpen){
-                    Robot.turret.setGateState(gatestate.OPEN);
-                }
+                Robot.turret.setGateState(gatestate.OPEN);
                 telemetry.addData("Shooting State", "Open Gate");
                 if (stateTimer.getElapsed() > 0.1){
                     shootingState = 2;
@@ -572,7 +458,7 @@ public class Teleop_Main_ extends LinearOpMode {
                 }
                 return;
             case 2:
-                Robot.intake.setMode(ON, ON);
+                Robot.intake.setMode(ON);
                 telemetry.addData("Shooting State", "Shoot First Two");
                 if (stateTimer.getElapsed() > 0.3 && Robot.intake.getTopSensorState() && !Robot.intake.getBottomSensorState()){
                     shootingState = 3;
@@ -591,10 +477,7 @@ public class Teleop_Main_ extends LinearOpMode {
                 }
                 return;
             case 4:
-                if (!forceGateOpen){
-                    Robot.turret.setGateState(gatestate.CLOSED);
-                }
-                Robot.intake.setMode(OFF, OFF);
+                Robot.turret.setGateState(gatestate.CLOSED);
                 Robot.intake.setTransfer(transferState.DOWN);
                 telemetry.addData("Shooting State", "Reset");
                 shootingState = 0;

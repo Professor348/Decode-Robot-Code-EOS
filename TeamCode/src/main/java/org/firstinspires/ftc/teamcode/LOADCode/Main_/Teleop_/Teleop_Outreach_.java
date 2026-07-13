@@ -86,9 +86,9 @@ public class Teleop_Outreach_ extends LinearOpMode {
             );
 
             if (Math.abs(gamepad1.right_stick_y) > 0.1){
-                Robot.intake.setMode(Intake.intakeMode.ON, Intake.intakeMode.ON);
+                Robot.intake.setMode(Intake.intakeMode.ON);
             }else{
-                Robot.intake.setMode(Intake.intakeMode.OFF, Intake.intakeMode.OFF);
+                Robot.intake.setMode(Intake.intakeMode.OFF);
             }
 
             if (gamepad1.yWasPressed()){
@@ -126,7 +126,7 @@ public class Teleop_Outreach_ extends LinearOpMode {
                     }
                     break;
                 case 2:
-                    Robot.intake.setMode(Intake.intakeMode.ON, Intake.intakeMode.ON);
+                    Robot.intake.setMode(Intake.intakeMode.ON);
                     telemetry.addData("Shooting State", "INTAKE_NOINTAKE FIRST TWO");
                     if (stateTimerHalfSec.isDone() && Robot.intake.getTopSensorState() && !Robot.intake.getBottomSensorState()){
                         shootingState = 3;
@@ -135,7 +135,7 @@ public class Teleop_Outreach_ extends LinearOpMode {
                     }
                     break;
                 case 3:
-                    Robot.intake.setMode(Intake.intakeMode.OFF, Intake.intakeMode.ON);
+                    Robot.intake.setMode(Intake.intakeMode.OFF);
                     Robot.intake.setTransfer(Intake.transferState.UP);
                     telemetry.addData("Shooting State", "INTAKE_NOINTAKE FINAL");
                     if (stateTimerHalfSec.isDone()) {
@@ -144,7 +144,7 @@ public class Teleop_Outreach_ extends LinearOpMode {
                     break;
                 case 4:
                     Robot.turret.setGateState(Turret.gatestate.CLOSED);
-                    Robot.intake.setMode(Intake.intakeMode.OFF, Intake.intakeMode.OFF);
+                    Robot.intake.setMode(Intake.intakeMode.OFF);
                     Robot.intake.setTransfer(Intake.transferState.DOWN);
                     telemetry.addData("Shooting State", "RESET");
                     shootingState = 0;

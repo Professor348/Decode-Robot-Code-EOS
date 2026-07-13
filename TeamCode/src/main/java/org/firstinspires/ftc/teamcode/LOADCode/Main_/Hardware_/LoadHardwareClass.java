@@ -74,11 +74,16 @@ public class LoadHardwareClass {
     }
 
     // Declare zones on the field for logic purposes
-    public static PolygonZone FarLaunchZone = new PolygonZone(
+    public static PolygonZone BackOfField = new PolygonZone(
             new Point(0, 0),
             new Point(0, 36),
             new Point(144, 36),
             new Point(144, 0)
+    );
+    public static PolygonZone FarLaunchZone = new PolygonZone(
+            new Point(96,0),
+            new Point(48, 0),
+            new Point(72, 24)
     );
     public static PolygonZone NearLaunchZone = new PolygonZone(
             new Point(72, 72),

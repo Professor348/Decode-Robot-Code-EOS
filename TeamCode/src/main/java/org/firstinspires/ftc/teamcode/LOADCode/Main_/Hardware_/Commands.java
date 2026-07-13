@@ -72,7 +72,7 @@ public class Commands {
 
     public Command setIntakeMode(Intake.intakeMode intake) {
         return new InstantCommand(new LambdaCommand("setIntakeMode()")
-                .setStart(() -> Robot.intake.setMode(intake, ON))
+                .setStart(() -> Robot.intake.setMode(intake))
         );
     }
 

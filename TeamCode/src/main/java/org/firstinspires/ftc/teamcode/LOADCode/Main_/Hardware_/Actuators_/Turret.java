@@ -230,7 +230,7 @@ public class Turret {
         if (selectedAlliance == LoadHardwareClass.Alliance.RED) {goalPose = new Pose(144, 144, 0);}
         double distance = Math.max(0, Math.min(Robot.drivetrain.follower.getPose().distanceFrom(goalPose), 300));
         double angle = 0;
-        if (robotZone.isInside(LoadHardwareClass.FarLaunchZone)){
+        if (robotZone.isInside(LoadHardwareClass.BackOfField)){
             angle = hoodLUTfar.get(distance);
         }else{
             angle = hoodLUTnear.get(distance);
@@ -280,7 +280,7 @@ public class Turret {
             nearPose = rotationalNearGoalPoseBlue;
         }
 
-        if(robotZone.isInside(LoadHardwareClass.FarLaunchZone)){
+        if(robotZone.isInside(LoadHardwareClass.BackOfField)){
             return farPose;
         }else{
             return nearPose;
@@ -426,12 +426,12 @@ public class Turret {
         Pose goalPose = new Pose(0,144,0);
         if (selectedAlliance == LoadHardwareClass.Alliance.RED) {goalPose = new Pose(144, 144, 0);}
 
-        opMode.telemetry.addData("In Far Zone", robotZone.isInside(LoadHardwareClass.FarLaunchZone));
+        opMode.telemetry.addData("In Far Zone", robotZone.isInside(LoadHardwareClass.BackOfField));
         opMode.telemetry.addData("In Near Zone", robotZone.isInside(LoadHardwareClass.NearLaunchZone));
 
         switch (mode) {
             case 0:
-                if (robotZone.isInside(LoadHardwareClass.FarLaunchZone)) {
+                if (robotZone.isInside(LoadHardwareClass.BackOfField)) {
                     targetRPM = flywheelFarSpeed;
                     actualFlywheelCoefficients = flywheelCoefficients4200;
                     actualFlywheelFFCoefficients = flywheelFFCoefficients4200;
