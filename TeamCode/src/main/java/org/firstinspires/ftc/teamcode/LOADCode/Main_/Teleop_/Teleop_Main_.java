@@ -428,12 +428,14 @@ public class Teleop_Main_ extends LinearOpMode {
         boolean isPartlyInShootZone = Robot.drivetrain.isPartlyInFarZone() || Robot.drivetrain.isPartlyInNearZone();
         boolean isFullyInShootZone = Robot.drivetrain.isFullyInFarZone() || Robot.drivetrain.isFullyInNearZone();
 
+        boolean autoShoot = isFullyInShootZone && Robot.intake.getBottomSensorState() && Robot.intake.getTopSensorState();
+        boolean manualShoot = gamepad1.bWasPressed() && (isPartlyInShootZone || isFullyInShootZone);
+        boolean isSlowEnough = Robot.drivetrain.follower.getVelocity().getMagnitude() < 5 && Robot.drivetrain.follower.getAngularVelocity() < 0.02;
+
         //Shoot (B Button Press)
         // Increment the shooting state
-        if ((isFullyInShootZone || (gamepad1.bWasPressed() && isPartlyInShootZone)) &&
-                Robot.drivetrain.follower.getVelocity().getMagnitude() < 5 &&
-                Robot.drivetrain.follower.getAngularVelocity() < 0.02 &&
-                shootingState < 1 &&
+        if (
+                (autoShoot || manualShoot) && isSlowEnough && shootingState < 1 &&
                 Robot.turret.getFlywheelRPM() > Robot.turret.getFlywheelCurrentMaxSpeed()-100
         ) {
             shootingState++;
